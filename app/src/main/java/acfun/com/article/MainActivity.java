@@ -2,8 +2,8 @@ package acfun.com.article;
 
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -14,11 +14,14 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+
+
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    private int state;
-    private final int MAIN_FRAGMENT = 0;
+    public int state = 0;
+    static final int MAIN_FRAGMENT = 0;
+    static final int ARTICLE_FRAGMENT = 1;
 
     private FloatingActionButton fab;
     private MainFragment mainFragment;
@@ -43,6 +46,8 @@ public class MainActivity extends AppCompatActivity
                         transaction.replace(R.id.main_fragment_container, mainFragment);
                         transaction.commit();
                         state = MAIN_FRAGMENT;
+                        break;
+                    case ARTICLE_FRAGMENT:
                         break;
                     default:
                         break;
@@ -72,6 +77,11 @@ public class MainActivity extends AppCompatActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
+            if (state == ARTICLE_FRAGMENT) {
+                setState(MAIN_FRAGMENT);
+                changeFab();
+
+            }
             super.onBackPressed();
         }
     }
@@ -131,4 +141,17 @@ public class MainActivity extends AppCompatActivity
         fab.hide();
     }
 
+    public void setState(int state){
+        this.state = state;
+    }
+
+    public void changeFab(){
+        if (state == ARTICLE_FRAGMENT) {
+            fab.setImageResource(R.drawable.my_menu);
+            showFab();
+        }else if(state == MAIN_FRAGMENT) {
+            fab.setImageResource(R.drawable.my_refresh);
+        }
+
+    }
 }

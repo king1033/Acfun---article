@@ -1,6 +1,8 @@
 package acfun.com.article;
 
+import android.app.Activity;
 import android.content.Context;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -22,34 +24,42 @@ public class RvAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private static final int TYPE_ITEM = 0;
     private static final int TYPE_FOOTER = 1;                             //!!!!!!!!!!!!!!!!!!!
 
-    public interface OnItemClickListener {
+
+/*    public interface OnItemClickListener {
         void onItemClick(View view, int position);
 
         void onItemLongClick(View view, int position);
-    }                                                                     //!!!!!!!!!!!!!!!!!!!
+    }                                                                     //监听器接口
 
     private OnItemClickListener onItemClickListener;
 
     public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
         this.onItemClickListener = onItemClickListener;
-    }                                                                     //!!!!!!!!!!!!!!!!!!!
+    }                                                                     //!!!!!!!!!!!!!!!!!!!*/
+
+    private MainActivity mainActivity;
+    private ArticleFragment articleFragment;
+    private FragmentTransaction transaction;
 
     private Context mContext;
     private List<ArticleTitle> mTitles;
 
-    public RvAdapter(Context context,List<ArticleTitle> titleList){
+    public RvAdapter(Context context, Activity activity, List<ArticleTitle> titleList){
         mTitles = titleList;
         mContext = context;
+        mainActivity = (MainActivity) activity;
     }
     //自定义的ViewHolder，持有每个Item的的所有界面元素
     public static class NormalViewHolder extends RecyclerView.ViewHolder {
         TextView mTitle;
         TextView mUserName;
+        TextView mDescription;
         CardView mCardView;
         public NormalViewHolder(View itemView) {
             super(itemView);
             mTitle = (TextView)itemView.findViewById(R.id.tv_item_title);
             mUserName = (TextView)itemView.findViewById(R.id.tv_item_username);
+            mDescription = (TextView)itemView.findViewById(R.id.tv_item_description);
             mCardView = (CardView)itemView.findViewById(R.id.cv_item);
         }
     }
@@ -78,7 +88,10 @@ public class RvAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             final NormalViewHolder holder = (NormalViewHolder) temp;
             holder.mTitle.setText(mTitles.get(position).getTitle());
             holder.mUserName.setText(mTitles.get(position).getUserName());
+            holder.mDescription.setText(mTitles.get(position).getDescription());
 
+
+/*            //设置监听器接口
             if (onItemClickListener != null) {
                 holder.itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -96,7 +109,27 @@ public class RvAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                         return false;
                     }
                 });
-            }
+            }*/
+            holder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int position = holder.getLayoutPosition();
+                    transaction = mainActivity.getSupportFragmentManager().beginTransaction();
+                    transaction.add(R.id.main_fragment_container, ArticleFragment.newInstance(mTitles.get(position).getContentId()));
+                    transaction.addToBackStack(null);
+                    transaction.commit();
+                    mainActivity.setState(MainActivity.ARTICLE_FRAGMENT);
+                }
+            });
+            holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    int position = holder.getLayoutPosition();
+                    Log.d("test", "item long position = " + position);
+                    return true;
+                }
+            });
+
         }
     }
     //获取数据的数量

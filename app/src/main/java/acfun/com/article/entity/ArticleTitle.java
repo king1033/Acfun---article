@@ -10,6 +10,7 @@ public class ArticleTitle {
     private int comments;
     private int views;
     private String title;
+    private String description;
     private int contentId;
 
     public void setUserName(String userName){
@@ -58,5 +59,13 @@ public class ArticleTitle {
 
     public int getContentId(){
         return this.contentId;
+    }
+
+    public void setDescription(String description){
+        this.description = description.replaceAll("<br/>", "\n");
+    }
+
+    public String getDescription(){
+        return description;
     }
 }

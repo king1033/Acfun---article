@@ -1,15 +1,15 @@
 package acfun.com.article;
 
-import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -44,6 +44,7 @@ public class MainFragment extends Fragment {
     private RvAdapter adapter ;
 
     private MainActivity mainActivity;
+    private FragmentTransaction transaction;
 
 
 
@@ -69,12 +70,13 @@ public class MainFragment extends Fragment {
 
         final LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         mRecyclerView.setLayoutManager(layoutManager);
-        adapter = new RvAdapter(getActivity(), data);
+        adapter = new RvAdapter(getActivity(),mainActivity, data);
         mRecyclerView.setAdapter(adapter);
 
         mainActivity.hideFab();
 
         swipeRefreshLayout.setColorSchemeResources(R.color.colorAccent);
+        //滑动监听器
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -127,18 +129,19 @@ public class MainFragment extends Fragment {
 
         });
 
-        //添加点击事件
+/*        //添加点击事件
         adapter.setOnItemClickListener(new RvAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                Log.d("test", "item position = " + position);
+
+
             }
 
             @Override
             public void onItemLongClick(View view, int position) {
                 Log.d("test", "item long position = " + position);
             }
-        });
+        });*/
     }
 
 
@@ -174,13 +177,13 @@ public class MainFragment extends Fragment {
             @Override
             public void onFinish(Pages pages) {
                 data.addAll(pages.getArticleTitles());
-                handler.post(new Runnable() {
+                handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
                         swipeRefreshLayout.setRefreshing(false);
                         adapter.notifyDataSetChanged();
                     }
-                });
+                }, 300);
             }
 
             @Override

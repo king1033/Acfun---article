@@ -79,6 +79,7 @@ public class GetAndParseUrl {
             title.setViews(carr.getIntValue("views"));
             title.setTitle(carr.getString("title"));
             title.setContentId(carr.getIntValue("contentId"));
+            title.setDescription(carr.getString("description"));
             articleTitles.add(title);
         }
         Pages pages = new Pages();
