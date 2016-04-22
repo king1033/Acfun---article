@@ -1,0 +1,116 @@
+package acfun.com.article;
+
+import android.content.Context;
+import android.support.v7.widget.CardView;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
+
+import java.util.List;
+
+import acfun.com.article.entity.ArticleTitle;
+import acfun.com.article.entity.Pages;
+
+/**
+ *
+ */
+public class RvAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+
+    private static final int TYPE_ITEM = 0;
+    private static final int TYPE_FOOTER = 1;                             //!!!!!!!!!!!!!!!!!!!
+
+    public interface OnItemClickListener {
+        void onItemClick(View view, int position);
+
+        void onItemLongClick(View view, int position);
+    }                                                                     //!!!!!!!!!!!!!!!!!!!
+
+    private OnItemClickListener onItemClickListener;
+
+    public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
+        this.onItemClickListener = onItemClickListener;
+    }                                                                     //!!!!!!!!!!!!!!!!!!!
+
+    private Context mContext;
+    private List<ArticleTitle> mTitles;
+
+    public RvAdapter(Context context,List<ArticleTitle> titleList){
+        mTitles = titleList;
+        mContext = context;
+    }
+    //自定义的ViewHolder，持有每个Item的的所有界面元素
+    public static class NormalViewHolder extends RecyclerView.ViewHolder {
+        TextView mTitle;
+        TextView mUserName;
+        CardView mCardView;
+        public NormalViewHolder(View itemView) {
+            super(itemView);
+            mTitle = (TextView)itemView.findViewById(R.id.tv_item_title);
+            mUserName = (TextView)itemView.findViewById(R.id.tv_item_username);
+            mCardView = (CardView)itemView.findViewById(R.id.cv_item);
+        }
+    }
+
+    public static class FootViewHolder extends RecyclerView.ViewHolder {
+
+        public FootViewHolder(View footView) {
+            super(footView);
+        }
+    }
+
+    //在该方法中我们创建一个ViewHolder并返回，ViewHolder必须有一个带有View的构造函数，这个View就是我们Item的根布局，在这里我们使用自定义Item的布局；
+    @Override
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        if (viewType == TYPE_ITEM) {
+            return new NormalViewHolder(LayoutInflater.from(mContext).inflate(R.layout.rv_item, parent, false));
+        }else if (viewType == TYPE_FOOTER) {
+            return new FootViewHolder(LayoutInflater.from(mContext).inflate(R.layout.rv_item_foot, parent, false));
+        }
+        return null;
+    }
+
+    @Override
+    public void onBindViewHolder(final RecyclerView.ViewHolder temp, int position) {
+        if (temp instanceof  NormalViewHolder) {
+            final NormalViewHolder holder = (NormalViewHolder) temp;
+            holder.mTitle.setText(mTitles.get(position).getTitle());
+            holder.mUserName.setText(mTitles.get(position).getUserName());
+
+            if (onItemClickListener != null) {
+                holder.itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        int position = holder.getLayoutPosition();
+                        onItemClickListener.onItemClick(holder.itemView, position);
+                    }
+                });
+
+                holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(View v) {
+                        int position = holder.getLayoutPosition();
+                        onItemClickListener.onItemLongClick(holder.itemView, position);
+                        return false;
+                    }
+                });
+            }
+        }
+    }
+    //获取数据的数量
+    @Override
+    public int getItemCount() {
+        return mTitles == null ? 0 : mTitles.size() + 1;
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        if (position + 1 == getItemCount()) {
+            return TYPE_FOOTER;
+        } else {
+            return TYPE_ITEM;
+        }
+    }
+}
