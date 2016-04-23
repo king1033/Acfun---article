@@ -21,6 +21,7 @@ import java.util.List;
 import acfun.com.article.API.TitleApi;
 import acfun.com.article.entity.ArticleTitle;
 import acfun.com.article.entity.Pages;
+import acfun.com.article.util.GetAndParseHTML;
 import acfun.com.article.util.GetAndParseUrl;
 
 /**
@@ -168,6 +169,7 @@ public class MainFragment extends Fragment {
                 Log.d("test", e.toString());
             }
         });
+
     }
 
 
