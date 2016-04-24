@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import acfun.com.article.API.TitleApi;
 import acfun.com.article.entity.ArticleTitle;
@@ -106,7 +107,6 @@ public class MainFragment extends Fragment {
                 super.onScrolled(recyclerView, dx, dy);
                 int lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition();
                 if (lastVisibleItemPosition + 1 == adapter.getItemCount()) {
-                    Log.d("test", "loading executed");
 
                     boolean isRefreshing = swipeRefreshLayout.isRefreshing();
                     if (isRefreshing) {
@@ -122,7 +122,6 @@ public class MainFragment extends Fragment {
                             }
                         });
                         getData(++pageCount);
-                        Log.d("test", "load more completed");
                         isLoading = false;
                     }
                 }
@@ -148,9 +147,10 @@ public class MainFragment extends Fragment {
 
     public void initData(){
         GetAndParseUrl getAndParseUrl = new GetAndParseUrl(TitleApi.getBaseUrl(0,0,10,0));
-        getAndParseUrl.sendHttpRequest(new GetAndParseUrl.PagesCallbackListener() {
+        getAndParseUrl.pagesRequest(new GetAndParseUrl.CallbackListener() {
             @Override
-            public void onFinish(Pages pages) {
+            public void onFinish(Object object) {
+                Pages pages = (Pages) object;
                 pageCount = 1;
                 data.clear();
                 data.addAll(pages.getArticleTitles());
@@ -175,9 +175,10 @@ public class MainFragment extends Fragment {
 
     private void getData(int i){
         GetAndParseUrl getAndParseUrl = new GetAndParseUrl(TitleApi.getBaseUrl(0,0,10,i));
-        getAndParseUrl.sendHttpRequest(new GetAndParseUrl.PagesCallbackListener() {
+        getAndParseUrl.pagesRequest(new GetAndParseUrl.CallbackListener() {
             @Override
-            public void onFinish(Pages pages) {
+            public void onFinish(Object object) {
+                Pages pages = (Pages)object;
                 data.addAll(pages.getArticleTitles());
                 handler.postDelayed(new Runnable() {
                     @Override
@@ -206,10 +207,11 @@ abstract class MyRecyclerViewScrollLSN extends RecyclerView.OnScrollListener {
 
     abstract void onScrollDown();
 
+
     @Override
     public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+        //滑动状态
         super.onScrollStateChanged(recyclerView, newState);
-        Log.d("test", "StateChanged = " + newState);
     }
 
     @Override

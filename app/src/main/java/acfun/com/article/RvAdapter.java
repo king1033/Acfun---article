@@ -13,9 +13,8 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import acfun.com.article.ArticleTextViewFragment.ArticleTextViewFragment;
 import acfun.com.article.entity.ArticleTitle;
-import acfun.com.article.entity.Pages;
-import acfun.com.article.util.GetAndParseHTML;
 
 /**
  *
@@ -39,7 +38,6 @@ public class RvAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     }                                                                     //!!!!!!!!!!!!!!!!!!!*/
 
     private MainActivity mainActivity;
-    private ArticleFragment articleFragment;
     private FragmentTransaction transaction;
 
     private Context mContext;
@@ -116,33 +114,16 @@ public class RvAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 public void onClick(View v) {
                     int position = holder.getLayoutPosition();
                     transaction = mainActivity.getSupportFragmentManager().beginTransaction();
-                    final int contentId = mTitles.get(position).getContentId();
-                    /*transaction.add(R.id.main_fragment_container, ArticleFragment.newInstance(mTitles.get(position).getContentId()));
+                    /*transaction.replace(R.id.main_fragment_container, ArticleTextViewFragment.newInstance(mTitles.get(position).getContentId()));
+                    transaction.addToBackStack(null);
+                    transaction.commit();*/
+
+                    transaction.replace(R.id.main_fragment_container, ArticleFragment.newInstance(mTitles.get(position).getContentId()));
                     transaction.addToBackStack(null);
                     transaction.commit();
-                    mainActivity.setState(MainActivity.ARTICLE_FRAGMENT);*/
 
 
-                    GetAndParseHTML getAndParseHTML = new GetAndParseHTML("http://www.acfun.tv/a/ac" + contentId);
-                    getAndParseHTML.sendHTMLRequest(new GetAndParseHTML.DataCallbackListener() {
-                        @Override
-                        public void onFinish(String htmlData) {
-                            transaction.add(R.id.main_fragment_container, ArticleFragment.newInstance(contentId,htmlData));
-                            transaction.addToBackStack(null);
-                            transaction.commit();
-                            mainActivity.setState(MainActivity.ARTICLE_FRAGMENT);
-
-                        }
-
-                        @Override
-                        public void onError(Exception e) {
-
-                        }
-                    });
-
-
-
-
+                    mainActivity.setState(MainActivity.ARTICLE_FRAGMENT);
                 }
             });
             holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {

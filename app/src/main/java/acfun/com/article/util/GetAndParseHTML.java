@@ -27,6 +27,7 @@ public class GetAndParseHTML {
             @Override
             public void run() {
                 try {
+                    Log.d("test", address);
                     Document doc = Jsoup.connect(address).get();
                     Elements paragraphs = doc.select("#area-player p");
                     if (listener != null) {

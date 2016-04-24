@@ -3,9 +3,11 @@ package acfun.com.article;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -15,7 +17,15 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
+import acfun.com.article.entity.Article;
+import acfun.com.article.entity.Pages;
 import acfun.com.article.util.GetAndParseHTML;
+import acfun.com.article.util.GetAndParseUrl;
 
 /**
  *
@@ -27,11 +37,11 @@ public class ArticleFragment extends Fragment {
     private int contentId;
     private String htmlData;
     private MainActivity mainActivity;
+    private Handler handler;
 
-    public static ArticleFragment newInstance(int contentId, String htmlData){
+    public static ArticleFragment newInstance(int contentId){
         Bundle args = new Bundle();
         args.putInt("contentId", contentId);
-        args.putString("htmlData", htmlData);
         ArticleFragment fragment = new ArticleFragment();
         fragment.setArguments(args);
         return fragment;
@@ -51,8 +61,9 @@ public class ArticleFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         mView = inflater.inflate(R.layout.fragment_article, container, false);
+        handler = new Handler();
         contentId = getArguments().getInt("contentId");
-        htmlData = getArguments().getString("htmlData");
+
         mainActivity = (MainActivity) getActivity();
         mainActivity.changeFab();
 
@@ -62,12 +73,38 @@ public class ArticleFragment extends Fragment {
         webSettings.setJavaScriptEnabled(true);
         //设置可以访问文件
         webSettings.setAllowFileAccess(true);
-        //将图片调整到适合webview的大小
-        webSettings.setUseWideViewPort(false);
+        webSettings.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.SINGLE_COLUMN);
 
 
-        //加载内容html
-        webview.loadDataWithBaseURL("http://m.acfun.tv/v/?ac=" + contentId, htmlData ,"text/html", "UTF-8", null);
+
+        GetAndParseUrl getAndParseUrl = new GetAndParseUrl("http://api.acfun.tv/apiserver/content/article?contentId=" + contentId);
+        getAndParseUrl.contentRequest(new GetAndParseUrl.CallbackListener() {
+            @Override
+            public void onFinish(Object object) {
+                Article article = (Article) object;
+                String temp = article.contents.get(0).content;
+                Document doc = Jsoup.parse(temp);
+                Elements elements = doc.select("img[src]");
+                for (Element e : elements) {
+                    e.attr("style", "width:100%;height:auto");
+                    e.removeAttr("alt");
+                }
+                final String data = doc.outerHtml();
+
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        //加载内容html
+                        webview.loadDataWithBaseURL("http://api.acfun.tv/apiserver/content/article?contentId=" + contentId, data, "text/html", "UTF-8", null);
+                    }
+                });
+            }
+
+            @Override
+            public void onError(Exception e) {
+
+            }
+        });
 
 
         //设置Web视图

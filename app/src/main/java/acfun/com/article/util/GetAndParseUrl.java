@@ -1,6 +1,7 @@
 package acfun.com.article.util;
 
 import android.os.Handler;
+import android.util.Log;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
@@ -14,6 +15,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import acfun.com.article.entity.Article;
 import acfun.com.article.entity.ArticleTitle;
 import acfun.com.article.entity.Pages;
 
@@ -27,7 +29,17 @@ public class GetAndParseUrl {
         this.address = url;
     }
 
-    public  void sendHttpRequest (final PagesCallbackListener listener){
+    public void pagesRequest(final CallbackListener listener){
+        sendHttpRequest(listener, "pages");
+    }
+
+    public void contentRequest(final CallbackListener listener){
+        sendHttpRequest(listener, "content");
+    }
+
+
+
+    protected void sendHttpRequest (final CallbackListener listener, final String type){
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -35,6 +47,7 @@ public class GetAndParseUrl {
                 try {
                     URL url = new URL(address);                   //指定访问的服务器地址
                     connection = (HttpURLConnection) url.openConnection();                 //获取一个HttpURLConnection实例
+                    connection.addRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1547.66 Safari/537.36");
                     connection.setRequestMethod("GET");                        //GET表示希望从服务器获取数据   POST表示希望提交数据给服务器
                     connection.setConnectTimeout(8000);                                                 //连接超时的毫秒数
                     connection.setReadTimeout(8000);
@@ -46,7 +59,12 @@ public class GetAndParseUrl {
                         response.append(line);
                     }
                     if (listener != null) {
-                        listener.onFinish(parseJSON(response.toString()));
+                        if ("pages".equals(type)) {
+                            listener.onFinish(Json2Pages(response.toString()));
+                        }
+                        else if ("content".equals(type)){
+                            listener.onFinish(Json2Html(response.toString()));
+                        }
                     }
                 } catch (Exception e) {
                     if (listener != null) {
@@ -62,7 +80,7 @@ public class GetAndParseUrl {
         }).start();
     }
 
-    protected Pages parseJSON (String response){
+    protected Pages Json2Pages (String response){
         JSONObject rankList = JSON.parseObject(response);
 
         JSONObject page = rankList.getJSONObject("data").getJSONObject("page");
@@ -87,10 +105,19 @@ public class GetAndParseUrl {
         return pages;
     }
 
+    protected Article Json2Html (String response){
+        JSONObject jsonObject = JSON.parseObject(response);
 
-    public interface PagesCallbackListener {
-        void onFinish(Pages pages);
+        JSONObject content = jsonObject.getJSONObject("data").getJSONObject("fullArticle");
+        Article article = Article.newArticle(content);
+        return article;
+    }
+
+
+    public interface CallbackListener {
+        void onFinish(Object object);
 
         void onError (Exception e);
     }
+
 }
