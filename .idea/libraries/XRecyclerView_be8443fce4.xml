@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="XRecyclerView-be8443fce4">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/app/build/intermediates/exploded-aar/com.github.jianghejie/XRecyclerView/be8443fce4/res" />
+      <root url="jar://$PROJECT_DIR$/app/build/intermediates/exploded-aar/com.github.jianghejie/XRecyclerView/be8443fce4/jars/classes.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.github.jianghejie/XRecyclerView/be8443fce4/aa655157ae69458af2a106f8fcce764dc1873a8a/XRecyclerView-be8443fce4-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

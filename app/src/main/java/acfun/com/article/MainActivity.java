@@ -1,8 +1,12 @@
 package acfun.com.article;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -14,33 +18,26 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.nostra13.universalimageloader.cache.disc.naming.Md5FileNameGenerator;
-import com.nostra13.universalimageloader.cache.memory.impl.UsingFreqLimitedMemoryCache;
-import com.nostra13.universalimageloader.core.DisplayImageOptions;
-import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
-import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
-import com.nostra13.universalimageloader.core.download.BaseImageDownloader;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
-
-import java.io.IOException;
-
-import acfun.com.article.util.GetAndParseHTML;
 
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    public int state = 0;
-    static final int MAIN_FRAGMENT = 0;
-    static final int ARTICLE_FRAGMENT = 1;
+    static final String[] typesStr = {"综合", "工作·情感", "动漫文化", "漫画·小说"};
+    static final int[] channels = {110, 73, 74, 75};
+
+    private List<Fragment> fragments;
 
     private FloatingActionButton fab;
     private MainFragment mainFragment;
+
+    private TabLayout tabs;
+    private ViewPager viewPager;
+    private Handler handler;
+    private PageAdapter adapter;
     private FragmentTransaction transaction;
 
     @Override
@@ -50,55 +47,57 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-
-        fab = (FloatingActionButton) findViewById(R.id.fab);
-
-        fab.setOnClickListener(new View.OnClickListener() {
+        tabs = (TabLayout) findViewById(R.id.tabs);
+        viewPager = (ViewPager)findViewById(R.id.viewpager);
+        handler = new Handler();
+        new Thread(new Runnable() {
             @Override
-            public void onClick(View view) {
-                switch (state) {
-                    case MAIN_FRAGMENT:
-                        transaction = getSupportFragmentManager().beginTransaction();
-                        mainFragment = new MainFragment();
-                        transaction.replace(R.id.main_fragment_container, mainFragment);
-                        transaction.commit();
-                        state = MAIN_FRAGMENT;
-                        break;
-                    case ARTICLE_FRAGMENT:
-                        break;
-                    default:
-                        break;
+            public void run() {
+                for (String a : typesStr){
+                    tabs.addTab(tabs.newTab().setText(a));
                 }
+                fragments = new ArrayList<>();
+                for (int a : channels) {
+                    mainFragment = MainFragment.newInstance(a);
+                    fragments.add(mainFragment);
+                }
+                adapter = new PageAdapter(getSupportFragmentManager(), typesStr, fragments);
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        viewPager.setAdapter(adapter);
+                        tabs.setupWithViewPager(viewPager);
+                    }
+                });
             }
-        });
+        }).start();
+
+
+
+
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        assert drawer != null;
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        assert navigationView != null;
         navigationView.setNavigationItemSelectedListener(this);
 
-        transaction = getSupportFragmentManager().beginTransaction();
-        mainFragment = new MainFragment();
-        transaction.replace(R.id.main_fragment_container, mainFragment,"main");
-        transaction.commit();
-        state = MAIN_FRAGMENT;
+
+
     }
 
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        assert drawer != null;
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            if (state == ARTICLE_FRAGMENT) {
-                setState(MAIN_FRAGMENT);
-                changeFab();
-
-            }
             super.onBackPressed();
         }
     }
@@ -117,6 +116,11 @@ public class MainActivity extends AppCompatActivity
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
+        if(id == android.R.id.home)
+        {
+            finish();
+            return true;
+        }
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
@@ -133,7 +137,6 @@ public class MainActivity extends AppCompatActivity
 
         if (id == R.id.nav_camera) {
 
-
         } else if (id == R.id.nav_gallery) {
 
         } else if (id == R.id.nav_slideshow) {
@@ -147,29 +150,11 @@ public class MainActivity extends AppCompatActivity
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        assert drawer != null;
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
 
-    public void showFab(){
-        fab.show();
-    }
 
-    public void hideFab(){
-        fab.hide();
-    }
 
-    public void setState(int state){
-        this.state = state;
-    }
-
-    public void changeFab(){
-        if (state == ARTICLE_FRAGMENT) {
-            fab.setImageResource(R.drawable.my_menu);
-            showFab();
-        }else if(state == MAIN_FRAGMENT) {
-            fab.setImageResource(R.drawable.my_refresh);
-        }
-
-    }
 }

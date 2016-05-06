@@ -1,29 +1,30 @@
 package acfun.com.article;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import com.jcodecraeer.xrecyclerview.ProgressStyle;
+import com.jcodecraeer.xrecyclerview.XRecyclerView;
 
-import acfun.com.article.API.TitleApi;
-import acfun.com.article.entity.ArticleTitle;
-import acfun.com.article.entity.Pages;
-import acfun.com.article.util.GetAndParseHTML;
-import acfun.com.article.util.GetAndParseUrl;
+import acfun.com.article.API.ApiService;
+import acfun.com.article.API.UrlApi;
+import acfun.com.article.entity.TitlesList;
+import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
+import retrofit2.converter.gson.GsonConverterFactory;
+import rx.Observer;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 /**
  *
@@ -31,203 +32,156 @@ import acfun.com.article.util.GetAndParseUrl;
 public class MainFragment extends Fragment {
 
     private SwipeRefreshLayout swipeRefreshLayout;
-
-
+    private XRecyclerView mRecyclerView;
+    public RvAdapter adapter ;
     private View mView;
-    private Handler handler;
 
-    private Boolean isLoading = false;
-    private int pageCount = 1;
-
-    private RecyclerView mRecyclerView;
+    private Retrofit retrofit;
+    private ApiService apiService;
 
 
-    private List<ArticleTitle> data = new ArrayList<>();
-    private RvAdapter adapter ;
+    private int channelId;
+    private int page = 1;
 
-    private MainActivity mainActivity;
-    private FragmentTransaction transaction;
 
+    public static MainFragment newInstance(int channelId){
+        MainFragment mainFragment = new MainFragment();
+        Bundle args = new Bundle();
+        args.putInt("channelId", channelId);
+        mainFragment.setArguments(args);
+        return mainFragment;
+    }
+
+    //RefreshLayout刷新监听器
+    private SwipeRefreshLayout.OnRefreshListener onRefreshListener =
+            new SwipeRefreshLayout.OnRefreshListener() {
+        @Override
+        public void onRefresh() {
+            page = 1;
+            adapter.clearTitles();
+            adapter.notifyDataSetChanged();
+            loadData();
+        }
+    };
 
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        mView = inflater.inflate(R.layout.fragment_main, container, false);
-        handler = new Handler();
 
-        swipeRefreshLayout = (SwipeRefreshLayout) mView.findViewById(R.id.rv_swipe);
-        mRecyclerView = (RecyclerView) mView.findViewById(R.id.id_recycler_view);
+        if (mView == null) {
+            mView = inflater.inflate(R.layout.fragment_main, container, false);
+            channelId = getArguments().getInt("channelId");
 
-        mainActivity = (MainActivity)getActivity();
+            swipeRefreshLayout = (SwipeRefreshLayout) mView.findViewById(R.id.rv_swipe);
+            mRecyclerView = (XRecyclerView) mView.findViewById(R.id.id_recycler_view);
 
-        initView();
-        initData();
+
+            adapter = new RvAdapter(inflater, getContext());
+            mRecyclerView.setAdapter(adapter);
+
+            initRxJava();
+            initView();
+
+        }
 
         return mView;
     }
 
+    @Override
+    public void onViewCreated(View container, @Nullable Bundle savedInstanceState){
+
+    }
 
     private void initView(){
 
         final LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         mRecyclerView.setLayoutManager(layoutManager);
-        adapter = new RvAdapter(getActivity(),mainActivity, data);
-        mRecyclerView.setAdapter(adapter);
+        mRecyclerView.setPullRefreshEnabled(false);
+        mRecyclerView.setLoadingMoreProgressStyle(ProgressStyle.Pacman);
+        mRecyclerView.setLoadingListener(new XRecyclerView.LoadingListener() {
+            @Override
+            public void onRefresh() {
 
-        mainActivity.hideFab();
+            }
+
+            @Override
+            public void onLoadMore() {
+                loadData();
+            }
+        });
 
         swipeRefreshLayout.setColorSchemeResources(R.color.colorAccent);
         //滑动监听器
-        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+        swipeRefreshLayout.setOnRefreshListener(onRefreshListener);
+        //必须这样设置才能实现一打开界面自动刷新
+        swipeRefreshLayout.post(new Runnable() {
             @Override
-            public void onRefresh() {
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        initData();
-                    }
-                }, 2000);
+            public void run() {
+                swipeRefreshLayout.setRefreshing(true);
             }
         });
+        //监听器也要刷新
+        onRefreshListener.onRefresh();
 
-        mRecyclerView.addOnScrollListener(new MyRecyclerViewScrollLSN() {
-            @Override
-            void onScrollUp() {
-                mainActivity.hideFab();
-            }
 
-            @Override
-            void onScrollDown() {
-                mainActivity.showFab();
-            }
+    }
 
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-                int lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition();
-                if (lastVisibleItemPosition + 1 == adapter.getItemCount()) {
+    public void initRxJava(){
+        retrofit = new Retrofit.Builder()
+                .baseUrl(UrlApi.BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                .build();
+        apiService = retrofit.create(ApiService.class);
 
-                    boolean isRefreshing = swipeRefreshLayout.isRefreshing();
-                    if (isRefreshing) {
-                        adapter.notifyItemRemoved(adapter.getItemCount());
-                        return;
-                    }
-                    if (!isLoading) {
-                        isLoading = true;
-                        handler.post(new Runnable() {
+    }
+
+    public void loadData(){
+        apiService.RxGetTitlesList("apiserver/content/channel?orderBy=0&channelId=" + channelId +"&pageSize=10&pageNo=" + page)
+
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<TitlesList>() {
+                    @Override
+                    public void onCompleted() {
+                        page++;
+                        mRecyclerView.loadMoreComplete();
+                        swipeRefreshLayout.post(new Runnable() {
                             @Override
                             public void run() {
-                                mainActivity.showFab();
+                                swipeRefreshLayout.setRefreshing(false);
                             }
                         });
-                        getData(++pageCount);
-                        isLoading = false;
                     }
-                }
-            }
-
-        });
-
-/*        //添加点击事件
-        adapter.setOnItemClickListener(new RvAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(View view, int position) {
-
-
-            }
-
-            @Override
-            public void onItemLongClick(View view, int position) {
-                Log.d("test", "item long position = " + position);
-            }
-        });*/
-    }
-
-
-    public void initData(){
-        GetAndParseUrl getAndParseUrl = new GetAndParseUrl(TitleApi.getBaseUrl(0,0,10,0));
-        getAndParseUrl.pagesRequest(new GetAndParseUrl.CallbackListener() {
-            @Override
-            public void onFinish(Object object) {
-                Pages pages = (Pages) object;
-                pageCount = 1;
-                data.clear();
-                data.addAll(pages.getArticleTitles());
-                handler.post(new Runnable() {
                     @Override
-                    public void run() {
-                        swipeRefreshLayout.setRefreshing(false);
-                        adapter.notifyDataSetChanged();
+                    public void onError(Throwable e) {
+                        Log.d("test", e.toString());
+                        Toast.makeText(mView.getContext(),"刷新失败", Toast.LENGTH_SHORT).show();
+                        mRecyclerView.loadMoreComplete();
+                        swipeRefreshLayout.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                swipeRefreshLayout.setRefreshing(false);
+                            }
+                        });
+                    }
+                    @Override
+                    public void onNext(TitlesList titlesList) {
+                        adapter.getTitles(titlesList.getData().getPage().getList());
                     }
                 });
-            }
-
-            @Override
-            public void onError(Exception e) {
-
-                Log.d("test", e.toString());
-            }
-        });
-
     }
 
 
-    private void getData(int i){
-        GetAndParseUrl getAndParseUrl = new GetAndParseUrl(TitleApi.getBaseUrl(0,0,10,i));
-        getAndParseUrl.pagesRequest(new GetAndParseUrl.CallbackListener() {
-            @Override
-            public void onFinish(Object object) {
-                Pages pages = (Pages)object;
-                data.addAll(pages.getArticleTitles());
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        swipeRefreshLayout.setRefreshing(false);
-                        adapter.notifyDataSetChanged();
-                    }
-                }, 300);
-            }
 
-            @Override
-            public void onError(Exception e) {
 
-                Log.d("test", e.toString());
-            }
-        });
 
-    }
+
+
+
 
 }
 
-abstract class MyRecyclerViewScrollLSN extends RecyclerView.OnScrollListener {
-    private int mScrollThreshold;
-
-    abstract void onScrollUp();
-
-    abstract void onScrollDown();
 
 
-    @Override
-    public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-        //滑动状态
-        super.onScrollStateChanged(recyclerView, newState);
-    }
-
-    @Override
-    public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-        //判断向上向下滑
-        setScrollThreshold(4);
-        boolean isSignificantDelta = Math.abs(dy) > mScrollThreshold;
-        if (isSignificantDelta) {
-            if (dy > 0) {
-                onScrollUp();
-            } else {
-                onScrollDown();
-            }
-        }
-    }
-    public void setScrollThreshold(int scrollThreshold) {
-        mScrollThreshold = scrollThreshold;
-    }
-}
