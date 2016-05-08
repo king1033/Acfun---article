@@ -111,6 +111,7 @@ public class MainFragment extends Fragment {
             }
         });
 
+
         swipeRefreshLayout.setColorSchemeResources(R.color.colorAccent);
         //滑动监听器
         swipeRefreshLayout.setOnRefreshListener(onRefreshListener);

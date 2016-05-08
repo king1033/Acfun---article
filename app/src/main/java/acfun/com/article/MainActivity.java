@@ -1,5 +1,6 @@
 package acfun.com.article;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
@@ -17,6 +18,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.WindowManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,8 +28,8 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    static final String[] typesStr = {"综合", "工作·情感", "动漫文化", "漫画·小说"};
-    static final int[] channels = {110, 73, 74, 75};
+    static final String[] typesStr = {"综合", "工作·情感", "动漫文化", "漫画·小说","游戏"};
+    static final int[] channels = {110, 73, 74, 75, 164};
 
     private List<Fragment> fragments;
 
@@ -44,11 +46,13 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         tabs = (TabLayout) findViewById(R.id.tabs);
         viewPager = (ViewPager)findViewById(R.id.viewpager);
+
         handler = new Handler();
         new Thread(new Runnable() {
             @Override
@@ -118,7 +122,6 @@ public class MainActivity extends AppCompatActivity
 
         if(id == android.R.id.home)
         {
-            finish();
             return true;
         }
         //noinspection SimplifiableIfStatement

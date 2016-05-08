@@ -2,9 +2,17 @@ package acfun.com.article;
 
 import android.app.Application;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.os.Build;
+import android.view.WindowManager;
 
+import com.facebook.drawee.backends.pipeline.Fresco;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+import com.nostra13.universalimageloader.core.assist.ImageScaleType;
+import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
+import com.nostra13.universalimageloader.core.display.RoundedBitmapDisplayer;
 
 import java.io.File;
 
@@ -27,6 +35,9 @@ public class ArticleApp extends Application {
     public void onCreate() {
         super.onCreate();
         mContext = instance = this;
+        /*ImageLoaderConfiguration configuration = ImageLoaderConfiguration.createDefault(this);
+        ImageLoader.getInstance().init(configuration);*/
+        Fresco.initialize(instance);
     }
 
     /**

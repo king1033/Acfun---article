@@ -6,7 +6,7 @@ import java.util.List;
 /**
  *
  */
-public class Artic {
+public class Article {
 
     /**
      * success : true

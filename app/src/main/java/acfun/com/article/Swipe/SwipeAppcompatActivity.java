@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
+import acfun.com.article.R;
 import me.imid.swipebacklayout.lib.SwipeBackLayout;
 import me.imid.swipebacklayout.lib.Utils;
 import me.imid.swipebacklayout.lib.app.SwipeBackActivityBase;
@@ -20,6 +21,7 @@ public class SwipeAppcompatActivity extends AppCompatActivity implements SwipeBa
         super.onCreate(savedInstanceState);
         mHelper = new SwipeBackHelper(this);
         mHelper.onActivityCreate();
+        overridePendingTransition(R.anim.activity_open_enter, R.anim.activity_close_exit);
     }
 
     @Override

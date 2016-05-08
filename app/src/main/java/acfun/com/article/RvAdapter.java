@@ -21,8 +21,6 @@ public class RvAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private static final int TYPE_ITEM = 0;
 
-    public int foot;
-
     private Context context;
     private List<Title> mTitles;
 
@@ -32,7 +30,6 @@ public class RvAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         mTitles = new ArrayList<>();
         this.context = context;
         this.inflater = inflater;
-        foot = 1;
     }
 
 

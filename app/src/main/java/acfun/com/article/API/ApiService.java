@@ -1,6 +1,7 @@
 package acfun.com.article.API;
 
-import acfun.com.article.entity.Artic;
+import acfun.com.article.entity.Article;
+import acfun.com.article.entity.Comments;
 import acfun.com.article.entity.TitlesList;
 import retrofit2.http.GET;
 import retrofit2.http.Url;
@@ -15,6 +16,9 @@ public interface ApiService {
     Observable<TitlesList> RxGetTitlesList(@Url String url);
 
     @GET()
-    Observable<Artic> RxGetArticle(@Url String url);
+    Observable<Article> RxGetArticle(@Url String url);
+
+    @GET()
+    Observable<Comments> RxGetComments(@Url String url);
 
 }

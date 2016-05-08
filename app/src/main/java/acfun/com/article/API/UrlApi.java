@@ -22,6 +22,11 @@ public class UrlApi {
         return String.format((Locale.US),"http://api.acfun.tv/apiserver/content/article?contentId=%d",contentId);
     }
 
+    //评论
+    public static String getCommentUrl(int contentId, int page){
+        page = 1;
+        return String.format((Locale.US),"http://www.acfun.tv/comment_list_json.aspx?contentId=%d&currentPage=%d", contentId, page);
+    }
 
 
 }

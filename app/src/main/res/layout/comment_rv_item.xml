@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/cv_item"
+    android:background="?attr/rowBackground"
+    android:paddingTop="12dp"
+    android:paddingLeft="8dp"
+    android:paddingRight="8dp"
+    android:paddingBottom="10dp"
+    xmlns:fresco="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <com.facebook.drawee.view.SimpleDraweeView
+        android:id="@+id/comment_user_img"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        fresco:roundAsCircle="true"
+        fresco:roundedCornerRadius="180dp"
+        fresco:actualImageScaleType="focusCrop"/>
+
+    <TextView
+        android:id="@+id/comment_username"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="11sp"
+        android:textColor="@color/colorFontGray"
+        android:text="test"
+        android:layout_toRightOf="@+id/comment_user_img"
+        android:layout_toEndOf="@+id/comment_user_img"
+        android:layout_marginLeft="3dp"
+        android:layout_marginStart="3dp" />
+
+    <TextView
+        android:id="@+id/comment_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="9sp"
+        android:text="time"
+        android:layout_below="@+id/comment_username"
+        android:layout_alignLeft="@+id/comment_username"
+        android:layout_alignStart="@+id/comment_username" />
+
+    <TextView
+        android:id="@+id/comment_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="10sp"
+        android:text="#10"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
+    <TextView
+        android:id="@+id/comment_comment"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="7dp"
+        android:textSize="12sp"
+        android:textColor="@color/colorBlack"
+        android:text="test test test"
+        android:layout_below="@+id/comment_user_img"
+        android:layout_alignLeft="@+id/comment_user_img"
+        android:layout_alignStart="@+id/comment_user_img" />
+
+</RelativeLayout>

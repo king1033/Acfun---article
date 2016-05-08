@@ -13,15 +13,27 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
+import acfun.com.article.API.ApiService;
+import acfun.com.article.API.UrlApi;
 import acfun.com.article.Swipe.SwipeAppcompatActivity;
+import acfun.com.article.entity.Comments;
+import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
+import retrofit2.converter.gson.GsonConverterFactory;
+import rx.Observer;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 public class ArticleActivity extends SwipeAppcompatActivity {
 
     private int contentId;
 
     private ArticleFragment articleFragment;
+    private CommentFragment commentFragment;
     private FragmentManager fragmentManager;
     private FragmentTransaction transaction;
+
+    private FloatingActionButton fab;
 
     public static void start(Context context, int contentId){
         Intent intent = new Intent(context, ArticleActivity.class);
@@ -41,17 +53,27 @@ public class ArticleActivity extends SwipeAppcompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-/*        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+
+
+        fragmentManager = getSupportFragmentManager();
+
+        fab = (FloatingActionButton) findViewById(R.id.fab);
+        assert fab != null;
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                commentFragment = CommentFragment.newInstance(contentId);
+                transaction = fragmentManager.beginTransaction();
+                transaction.hide(articleFragment);
+                transaction.add(R.id.article_fragment_contain, commentFragment);
+                transaction.addToBackStack(null);
+                transaction.commit();
+                fab.hide();
             }
-        });*/
+        });
 
         articleFragment = ArticleFragment.newInstance(contentId);
-        fragmentManager = getSupportFragmentManager();
+
         transaction = fragmentManager.beginTransaction();
         transaction.replace(R.id.article_fragment_contain, articleFragment);
         transaction.commit();
@@ -66,11 +88,21 @@ public class ArticleActivity extends SwipeAppcompatActivity {
 
         if(id == android.R.id.home)
         {
-            finish();
+            getSwipeBackLayout().scrollToFinishActivity();
             return true;
         }
         return super.onOptionsItemSelected(item);
     }
+
+    @Override
+    public void onBackPressed() {
+        if(!fragmentManager.popBackStackImmediate()) {
+            getSwipeBackLayout().scrollToFinishActivity();
+        }else {
+            fab.show();
+        }
+    }
+
 
 
 }

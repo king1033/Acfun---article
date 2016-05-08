@@ -2,11 +2,8 @@ package acfun.com.article;
 
 
 import android.annotation.SuppressLint;
-import android.content.Intent;
 import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -26,7 +23,7 @@ import org.jsoup.select.Elements;
 
 import acfun.com.article.API.ApiService;
 import acfun.com.article.API.UrlApi;
-import acfun.com.article.entity.Artic;
+import acfun.com.article.entity.Article;
 
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
@@ -104,6 +101,14 @@ public class ArticleFragment extends Fragment {
     }
 
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        swipeRefreshLayout.removeView(webview);
+        webview.removeAllViews();
+        webview.destroy();
+    }
+
     //初始化WebView设置
     private void initWebSetting(){
         webSettings = webview.getSettings();
@@ -166,10 +171,12 @@ public class ArticleFragment extends Fragment {
         apiService.RxGetArticle("apiserver/content/article?contentId=" + contentId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .map(new Func1<Artic, String>() {
+                .map(new Func1<Article, String>() {
                     @Override
-                    public String call(Artic article) {
-                        return changeHtmlDoc(article.getData().getFullArticle().getTxt());
+                    public String call(Article article) {
+                        if (article.isSuccess()) {
+                            return changeHtmlDoc(article.getData().getFullArticle().getTxt());
+                        }else return null;
                     }
                 })
                 .subscribe(new Observer<String>() {
@@ -185,7 +192,9 @@ public class ArticleFragment extends Fragment {
 
                     @Override
                     public void onNext(String s) {
-                        webview.loadDataWithBaseURL(UrlApi.BASE_URL, s, null, "utf-8", null);
+                        if (s != null) {
+                            webview.loadDataWithBaseURL(UrlApi.BASE_URL, s, null, "utf-8", null);
+                        }
                     }
                 });
 
