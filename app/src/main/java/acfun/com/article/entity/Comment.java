@@ -1,5 +1,9 @@
 package acfun.com.article.entity;
 
+import android.view.View;
+
+import java.util.ArrayList;
+
 /**
  *
  */

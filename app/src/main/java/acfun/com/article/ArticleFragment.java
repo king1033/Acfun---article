@@ -168,7 +168,7 @@ public class ArticleFragment extends Fragment {
     }
 
     private void initData(){
-        apiService.RxGetArticle("apiserver/content/article?contentId=" + contentId)
+        apiService.RxGetArticle(contentId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .map(new Func1<Article, String>() {
@@ -187,7 +187,7 @@ public class ArticleFragment extends Fragment {
 
                     @Override
                     public void onError(Throwable e) {
-                        Log.d("test", e.toString());
+                        Log.d("test", "change Html Doc error: " + e.toString());
                     }
 
                     @Override
@@ -203,6 +203,7 @@ public class ArticleFragment extends Fragment {
     //更改修正html源码适应手机屏幕
     private String changeHtmlDoc(String html) {
         Document doc = Jsoup.parse(html);
+
 
 
         Elements elements = doc.select("p:has(img), div:has(img), span:has(img), li");

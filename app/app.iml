@@ -140,8 +140,8 @@
     <orderEntry type="library" exported="" name="swipe-back-layout-1.0" level="project" />
     <orderEntry type="library" exported="" name="imagepipeline-base-0.10.0" level="project" />
     <orderEntry type="library" exported="" name="retrofit-2.0.2" level="project" />
-    <orderEntry type="library" exported="" name="adapter-rxjava-2.0.2" level="project" />
     <orderEntry type="library" exported="" name="rxjava-1.1.4" level="project" />
+    <orderEntry type="library" exported="" name="adapter-rxjava-2.0.2" level="project" />
     <orderEntry type="library" exported="" name="rxandroid-1.2.0" level="project" />
     <orderEntry type="library" exported="" name="universal-image-loader-1.9.5" level="project" />
     <orderEntry type="library" exported="" name="converter-gson-2.0.2" level="project" />

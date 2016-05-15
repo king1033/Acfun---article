@@ -9,6 +9,7 @@ import java.util.Locale;
 public class UrlApi {
 
     public static final String BASE_URL = "http://api.acfun.tv/";
+    public static final String OFFICIAL_URL = "http://api.aixifan.com/";
 
     //文章 63
     //文章列表 - 综合 110

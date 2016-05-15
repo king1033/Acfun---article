@@ -3,6 +3,7 @@ package acfun.com.article;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -61,7 +62,7 @@ public class RvAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     public void onBindViewHolder(final RecyclerView.ViewHolder temp, final int position) {
         final NormalViewHolder holder = (NormalViewHolder) temp;
         Title mTitle = mTitles.get(position);
-        holder.mTitle.setText(mTitle.getTitle());
+        holder.mTitle.setText(Html.fromHtml(mTitle.getTitle()));
         holder.mUserName.setText(mTitle.getUser().getUsername());
         holder.mDescription.setText(mTitle.getDescription());
         holder.mComments.setText(Integer.toString(mTitle.getComments()));
@@ -69,7 +70,7 @@ public class RvAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             @Override
             public void onClick(View v) {
                 Title temp = mTitles.get(holder.getAdapterPosition() - 1);
-                ArticleActivity.start(context, temp.getContentId());
+                ArticleActivity.start(context, Integer.valueOf(temp.getContentId()));
             }
         });
     }

@@ -130,7 +130,7 @@ public class MainFragment extends Fragment {
 
     public void initRxJava(){
         retrofit = new Retrofit.Builder()
-                .baseUrl(UrlApi.BASE_URL)
+                .baseUrl(UrlApi.OFFICIAL_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .build();
@@ -139,8 +139,8 @@ public class MainFragment extends Fragment {
     }
 
     public void loadData(){
-        apiService.RxGetTitlesList("apiserver/content/channel?orderBy=0&channelId=" + channelId +"&pageSize=10&pageNo=" + page)
-
+        /*apiService.RxGetTitlesList("apiserver/content/channel?orderBy=0&channelId=" + channelId +"&pageSize=10&pageNo=" + page)*/
+        apiService.GetTitleList(2, 4, page, 10, 0, channelId, 0)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<TitlesList>() {
@@ -169,7 +169,7 @@ public class MainFragment extends Fragment {
                     }
                     @Override
                     public void onNext(TitlesList titlesList) {
-                        adapter.getTitles(titlesList.getData().getPage().getList());
+                        adapter.getTitles(titlesList.getData().getList());
                     }
                 });
     }

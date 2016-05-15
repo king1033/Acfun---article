@@ -7,6 +7,7 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="rowBackground">@drawable/row_backgroud</item>
+        <item name="requoteBackground">@drawable/requote_bg</item>
 
     </style>
 

@@ -1,84 +1,51 @@
 package acfun.com.article.entity;
 
+import java.util.List;
+
 /**
  *
  */
 public class Title {
 
     /**
-     * userId : 27
-     * username : 小匆菌
-     * userImg : http://cdn.aixifan.com/dotnet/artemis/u/cms/www/201506/15111245v27v.jpg
+     * channelId : 110
+     * comments : 31
+     * contentId : 2727692
+     * cover : http://cdn.aixifan.com/dotnet/20120923/style/image/cover-night.png
+     * description : 捕参者:月挣三四万 下海流鼻血（新浪）
+     * isArticle : 1
+     * isRecommend : 0
+     * releaseDate : 1462768070000
+     * stows : 20
+     * tags : ["捕参"]
+     * title : 捕参者:月挣三四万 下海流鼻血
+     * toplevel : 1
+     * user : {"userImg":"","userId":579011,"username":"会计"}
+     * viewOnly : 0
+     * views : 7577
+     */
+
+    private int channelId;
+    private int comments;
+    private String contentId;
+    private String cover;
+    private String description;
+    private int isArticle;
+    private int isRecommend;
+    private long releaseDate;
+    private int stows;
+    private String title;
+    private int toplevel;
+    /**
+     * userImg :
+     * userId : 579011
+     * username : 会计
      */
 
     private User user;
-    /**
-     * user : {"userId":27,"username":"小匆菌","userImg":"http://cdn.aixifan.com/dotnet/artemis/u/cms/www/201506/15111245v27v.jpg"}
-     * tags : []
-     * description : 传统艺术与现代科技的结合「初音歌舞伎」
-     * contentId : 2721598
-     * isArticle : 1
-     * channelId : 74
-     * isRecommend : 0
-     * comments : 0
-     * title : 传统艺术与现代科技的结合「初音歌舞伎」
-     * cover : http://cdn.aixifan.com/dotnet/20120923/style/image/cover-day.png
-     * stows : 0
-     * views : 0
-     * danmakuSize : 0
-     * releaseDate : 1462518536000
-     * viewOnly : 0
-     * toplevel : 0
-     * tudouDomain : 0
-     */
-
-    private String description;
-    private int contentId;
-    private int isArticle;
-    private int channelId;
-    private int isRecommend;
-    private int comments;
-    private String title;
-    private String cover;
-    private int stows;
-    private int views;
-    private int danmakuSize;
-    private long releaseDate;
     private int viewOnly;
-    private int toplevel;
-    private int tudouDomain;
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public int getContentId() {
-        return contentId;
-    }
-
-    public void setContentId(int contentId) {
-        this.contentId = contentId;
-    }
-
-    public int getIsArticle() {
-        return isArticle;
-    }
-
-    public void setIsArticle(int isArticle) {
-        this.isArticle = isArticle;
-    }
+    private int views;
+    private List<String> tags;
 
     public int getChannelId() {
         return channelId;
@@ -86,14 +53,6 @@ public class Title {
 
     public void setChannelId(int channelId) {
         this.channelId = channelId;
-    }
-
-    public int getIsRecommend() {
-        return isRecommend;
-    }
-
-    public void setIsRecommend(int isRecommend) {
-        this.isRecommend = isRecommend;
     }
 
     public int getComments() {
@@ -104,12 +63,12 @@ public class Title {
         this.comments = comments;
     }
 
-    public String getTitle() {
-        return title;
+    public String getContentId() {
+        return contentId;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public void setContentId(String contentId) {
+        this.contentId = contentId;
     }
 
     public String getCover() {
@@ -120,28 +79,28 @@ public class Title {
         this.cover = cover;
     }
 
-    public int getStows() {
-        return stows;
+    public String getDescription() {
+        return description;
     }
 
-    public void setStows(int stows) {
-        this.stows = stows;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
-    public int getViews() {
-        return views;
+    public int getIsArticle() {
+        return isArticle;
     }
 
-    public void setViews(int views) {
-        this.views = views;
+    public void setIsArticle(int isArticle) {
+        this.isArticle = isArticle;
     }
 
-    public int getDanmakuSize() {
-        return danmakuSize;
+    public int getIsRecommend() {
+        return isRecommend;
     }
 
-    public void setDanmakuSize(int danmakuSize) {
-        this.danmakuSize = danmakuSize;
+    public void setIsRecommend(int isRecommend) {
+        this.isRecommend = isRecommend;
     }
 
     public long getReleaseDate() {
@@ -152,12 +111,20 @@ public class Title {
         this.releaseDate = releaseDate;
     }
 
-    public int getViewOnly() {
-        return viewOnly;
+    public int getStows() {
+        return stows;
     }
 
-    public void setViewOnly(int viewOnly) {
-        this.viewOnly = viewOnly;
+    public void setStows(int stows) {
+        this.stows = stows;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public int getToplevel() {
@@ -168,18 +135,50 @@ public class Title {
         this.toplevel = toplevel;
     }
 
-    public int getTudouDomain() {
-        return tudouDomain;
+    public User getUser() {
+        return user;
     }
 
-    public void setTudouDomain(int tudouDomain) {
-        this.tudouDomain = tudouDomain;
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public int getViewOnly() {
+        return viewOnly;
+    }
+
+    public void setViewOnly(int viewOnly) {
+        this.viewOnly = viewOnly;
+    }
+
+    public int getViews() {
+        return views;
+    }
+
+    public void setViews(int views) {
+        this.views = views;
+    }
+
+    public List<String> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<String> tags) {
+        this.tags = tags;
     }
 
     public static class User {
+        private String userImg;
         private int userId;
         private String username;
-        private String userImg;
+
+        public String getUserImg() {
+            return userImg;
+        }
+
+        public void setUserImg(String userImg) {
+            this.userImg = userImg;
+        }
 
         public int getUserId() {
             return userId;
@@ -195,14 +194,6 @@ public class Title {
 
         public void setUsername(String username) {
             this.username = username;
-        }
-
-        public String getUserImg() {
-            return userImg;
-        }
-
-        public void setUserImg(String userImg) {
-            this.userImg = userImg;
         }
     }
 }
