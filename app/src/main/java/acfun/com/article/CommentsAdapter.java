@@ -2,8 +2,10 @@ package acfun.com.article;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
 import android.text.Html;
 import android.util.Log;
 import android.util.SparseArray;
@@ -17,9 +19,12 @@ import android.widget.TextView;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
+import org.xml.sax.XMLReader;
+
 import java.util.ArrayList;
 import java.util.List;
 
+import acfun.com.article.API.ParseCommentText;
 import acfun.com.article.View.FloorsView;
 import acfun.com.article.entity.Comment;
 
@@ -36,11 +41,13 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     private List<Integer> commentIdList;
     private SparseArray<Comment> data;
+    private SparseArray<ArrayList<View>> viewData;
 
 
     public CommentsAdapter(Context context){
         this.context = context;
         this.inflater = LayoutInflater.from(context);
+        viewData = new SparseArray<>();
     }
 
     public class CommentViewHolder extends RecyclerView.ViewHolder {
@@ -76,19 +83,24 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         CommentViewHolder holder = (CommentViewHolder)temp;
         Comment comment = getItem(position);
 
+
         if (comment.getNameRed() == 1){
             holder.userName.setTextColor(Color.RED);
         }
         holder.userName.setText(comment.getUserName());
         holder.time.setText(comment.getPostDate());
         holder.count.setText("#" + comment.getCount());
-        holder.content.setText(Html.fromHtml(comment.getContent()));
+        ParseCommentText.setCommentContent(comment.getContent(), holder.content);
         holder.userImg.setImageURI(Uri.parse(comment.getUserImg()));
         holder.hasFrame = comment.getQuoteId() > 0;
         holder.floorFrame.removeAllViews();
         if (holder.hasFrame){
-
-            holder.floorFrame.setCommentView(getViewList(comment));
+            ArrayList<View> tempView = viewData.get(position);
+            if (tempView == null){
+                tempView = getViewList(comment);
+                viewData.put(position, tempView);
+            }
+            holder.floorFrame.setCommentView(tempView);
         }
 
     }
@@ -120,34 +132,34 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     private ArrayList<View> getViewList(Comment comment){
         int quoteId = comment.getQuoteId();
-        ArrayList<View> viewList = new ArrayList<>();
-        View lastView = inflater.inflate(R.layout.comments_view_show,null);
-        LastCommentViewHolder holder = new LastCommentViewHolder();
-        holder.lastContent = (TextView) lastView.findViewById(R.id.comments_last);
-        holder.lastShow = (TextView) lastView.findViewById(R.id.comments_last_show);
+            ArrayList<View> viewList = new ArrayList<>();
+            View lastView = inflater.inflate(R.layout.comments_view_show, null);
+            LastCommentViewHolder holder = new LastCommentViewHolder();
+            holder.lastContent = (TextView) lastView.findViewById(R.id.comments_last);
+            holder.lastShow = (TextView) lastView.findViewById(R.id.comments_last_show);
 
-        holder.isShowing = true;
-        if (comment.getRefCount() > 0 ){
-            holder.isShowing = false;
-            holder.isRef = true;
-        }
-        lastView.setTag(holder);
-        viewList.add(lastView);
-
-        for (Comment quote = data.get(quoteId); quote != null ;quoteId = quote.getQuoteId(), quote = data.get(quoteId)) {
-            View itemView = inflater.inflate(R.layout.comments_view_item, null);
-            TextView userName = (TextView) itemView.findViewById(R.id.user_name);
-            TextView content = (TextView) itemView.findViewById(R.id.comments_content);
-            TextView floor = (TextView) itemView.findViewById(R.id.floor);
-            if (quote.getNameRed() == 1){
-                userName.setTextColor(Color.RED);
+            holder.isShowing = true;
+            if (comment.getRefCount() > 0) {
+                holder.isShowing = false;
+                holder.isRef = true;
             }
-            userName.setText(quote.getUserName());
-            content.setText(Html.fromHtml(quote.getContent()));
-            floor.setText("#" + quote.getCount());
-            viewList.add(itemView);
-        }
+            lastView.setTag(holder);
+            viewList.add(lastView);
 
+            for (Comment quote = data.get(quoteId); quote != null; quoteId = quote.getQuoteId(), quote = data.get(quoteId)) {
+                View itemView = inflater.inflate(R.layout.comments_view_item, null);
+
+                TextView userName = (TextView) itemView.findViewById(R.id.user_name);
+                TextView content = (TextView) itemView.findViewById(R.id.comments_content);
+                TextView floor = (TextView) itemView.findViewById(R.id.floor);
+                if (quote.getNameRed() == 1) {
+                    userName.setTextColor(Color.RED);
+                }
+                userName.setText(quote.getUserName());
+                ParseCommentText.setCommentContent(quote.getContent(), content);
+                floor.setText("#" + quote.getCount());
+                viewList.add(itemView);
+            }
         return viewList;
     }
 

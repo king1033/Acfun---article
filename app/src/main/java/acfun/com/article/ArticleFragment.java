@@ -47,14 +47,6 @@ public class ArticleFragment extends Fragment {
     private int contentId;
 
     private View mView;
-    private SwipeRefreshLayout swipeRefreshLayout;
-    private SwipeRefreshLayout.OnRefreshListener onRefreshListener =
-            new SwipeRefreshLayout.OnRefreshListener() {
-                @Override
-                public void onRefresh() {
-                    initData();
-                }
-            };
 
 
     public static ArticleFragment newInstance(int contentId){
@@ -73,7 +65,6 @@ public class ArticleFragment extends Fragment {
         mView = inflater.inflate(R.layout.fragment_article, container, false);
         contentId = getArguments().getInt("contentId");
 
-        swipeRefreshLayout = (SwipeRefreshLayout) mView.findViewById(R.id.article_swipe);
         webview = (WebView) mView.findViewById(R.id.web_view);
 
 
@@ -82,20 +73,7 @@ public class ArticleFragment extends Fragment {
         initWebSetting();
 
 
-        //swipeRefresh
-        swipeRefreshLayout.setColorSchemeResources(R.color.colorAccent);
-        //滑动监听器
-        swipeRefreshLayout.setOnRefreshListener(onRefreshListener);
-        //必须这样设置才能实现一打开界面自动刷新
-        swipeRefreshLayout.post(new Runnable() {
-            @Override
-            public void run() {
-                swipeRefreshLayout.setRefreshing(true);
-            }
-        });
-        //监听器也要刷新
-        onRefreshListener.onRefresh();
-
+        initData();
 
         return mView;
     }
@@ -104,7 +82,7 @@ public class ArticleFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        swipeRefreshLayout.removeView(webview);
+
         webview.removeAllViews();
         webview.destroy();
     }
@@ -142,7 +120,6 @@ public class ArticleFragment extends Fragment {
 
             @Override
             public void onPageFinished(WebView view, String url) {                                  //加载网页后
-                swipeRefreshLayout.setRefreshing(false);
                 webSettings.setBlockNetworkImage(false);
 
                 webview.loadUrl("javascript:(function(){"

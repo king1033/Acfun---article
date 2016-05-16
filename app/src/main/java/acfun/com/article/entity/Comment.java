@@ -3,6 +3,7 @@ package acfun.com.article.entity;
 import android.view.View;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -40,6 +41,7 @@ public class Comment {
     private int downs;
     private int nameRed;
     private int avatarFrame;
+
 
     public int getCid() {
         return cid;

@@ -5,9 +5,11 @@ import android.graphics.Canvas;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -43,49 +45,58 @@ public class FloorsView extends LinearLayout {
 
     @Override
     protected void dispatchDraw(Canvas canvas) {
-        final int i = getChildCount();
-        Drawable border = ContextCompat.getDrawable(getContext(), R.drawable.floors_item);
+        final int i = getChildCount() - 1;
 
-        for (int j = i - 1; j >= 0; j--){
-            View itemView = getChildAt(j);
-            if (j == i - 1){
-                ColorDrawable drawable = new ColorDrawable(0xFFFFFEEE);
-                drawable.setBounds(itemView.getLeft(), itemView.getLeft(),
-                        itemView.getRight(), itemView.getBottom());
-                drawable.draw(canvas);
-            }
-            border.setBounds(itemView.getLeft(), itemView.getLeft(),
+        if (i > 0) {
+            View itemView = getChildAt(i);
+
+            ColorDrawable drawable = new ColorDrawable(0xFFFFFEEE);
+            drawable.setBounds(itemView.getLeft(), 0,
                     itemView.getRight(), itemView.getBottom());
-            border.draw(canvas);
+            drawable.draw(canvas);
 
         }
+
+
         super.dispatchDraw(canvas);
     }
 
+    @Override
+    protected boolean drawChild(Canvas canvas, View child, long drawingTime){
+        Drawable border = ContextCompat.getDrawable(getContext(), R.drawable.floors_item);
+        border.setBounds(child.getLeft(), child.getLeft(),
+                child.getRight(), child.getBottom());
+        border.draw(canvas);
+        return super.drawChild(canvas, child, drawingTime);
+    }
 
     public void setCommentView(List<View> commentList) {
+
+
         int j = 0;
         final int offset = 6;
         int i = commentList.size() - 1;
 
         View lastItem = commentList.get(0);
+        if (lastItem.getParent() != null){
+            ((ViewGroup)lastItem.getParent()).removeView(lastItem);
+        }
         CommentsAdapter.LastCommentViewHolder holder = (CommentsAdapter.LastCommentViewHolder) lastItem.getTag();
         setLastViewText(holder, i);
         lastItem.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                LayoutParams params = generateDefaultLayoutParams();
                 CommentsAdapter.LastCommentViewHolder holder = (CommentsAdapter.LastCommentViewHolder) v.getTag();
                 if (holder.isShowing) {
                     holder.isShowing = false;
                     setLastViewText(holder, getChildCount() - 1 );
-                    params.topMargin = offset * (getChildCount() - 1);
+
+                    int scroll = v.getTop();
+                    ((View)getParent().getParent()).scrollBy(0, -scroll);
                 } else {
                     holder.isShowing = true;
                     setLastViewText(holder, getChildCount() - 1 );
-                    params.topMargin = 0;
                 }
-                v.setLayoutParams(params);
                 for (int i = 0; i < getChildCount() - 1; i++) {
                     View itemView = getChildAt(i);
                     if (!holder.isShowing) {
@@ -108,6 +119,9 @@ public class FloorsView extends LinearLayout {
             params.rightMargin = k;
             params.topMargin = j == 0 ? k : 0;
             View item = commentList.get(i);
+            if (item.getParent() != null){
+                ((ViewGroup)item.getParent()).removeView(item);
+            }
             item.setVisibility(GONE);
 
             if (holder.isShowing) {
@@ -115,9 +129,6 @@ public class FloorsView extends LinearLayout {
             }
             addView(item, j++, params);
         }
-
-
-
 
         addView(lastItem);
 
