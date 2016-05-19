@@ -6,7 +6,7 @@
 
     <string name="action_settings">Settings</string>
 
-    <string name="it_from">来自</string>
+    <string name="it_from">UP主:</string>
     <string name="it_comments">评论</string>
     <string name="title_activity_artcle">ArtcleActivity</string>
 </resources>

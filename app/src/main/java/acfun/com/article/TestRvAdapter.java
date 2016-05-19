@@ -1,9 +1,9 @@
 package acfun.com.article;
 
 import android.content.Context;
-import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -21,7 +22,7 @@ import acfun.com.article.entity.Title;
  *
  */
 //recyclerView适配器
-public class RvAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class TestRvAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private static final int TYPE_ITEM = 0;
 
@@ -30,7 +31,7 @@ public class RvAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private LayoutInflater inflater;
 
-    public RvAdapter(LayoutInflater inflater, Context context){
+    public TestRvAdapter(LayoutInflater inflater, Context context){
         mTitles = new ArrayList<>();
         this.context = context;
         this.inflater = inflater;
@@ -44,6 +45,8 @@ public class RvAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         TextView mDescription;
         TextView mComments;
         TextView mTime;
+        TextView mStows;
+        TextView mViewer;
         public NormalViewHolder(final View itemView) {
             super(itemView);
             mTitle = (TextView)itemView.findViewById(R.id.tv_item_title);
@@ -51,6 +54,8 @@ public class RvAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             mDescription = (TextView)itemView.findViewById(R.id.tv_item_description);
             mComments = (TextView)itemView.findViewById(R.id.tv_item_comments);
             mTime = (TextView)itemView.findViewById(R.id.tv_item_time);
+            mStows = (TextView)itemView.findViewById(R.id.tv_item_stows);
+            mViewer = (TextView)itemView.findViewById(R.id.tv_item_viewer);
         }
     }
 
@@ -72,6 +77,8 @@ public class RvAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         holder.mDescription.setText(mTitle.getDescription());
         holder.mComments.setText(Integer.toString(mTitle.getComments()));
         holder.mTime.setText(parseTimeData(mTitle.getReleaseDate()));
+        holder.mStows.setText(Integer.toString(mTitle.getStows()));
+        holder.mViewer.setText(Integer.toString(mTitle.getViews()));
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -99,10 +106,34 @@ public class RvAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         mTitles.clear();
     }
 
-    public String parseTimeData(long data){
-        Log.d("test", "" + data);
-        SimpleDateFormat bartDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.CHINA);
-        Log.d("test", bartDateFormat.format(data));
-        return bartDateFormat.format(data);
+    public String parseTimeData(long postTime){
+        final long _1_min = 60 * 1000;
+        final long _1_hour = 60 * _1_min;
+        final long _24_hour = 24 * _1_hour;
+        final long _7_day = 7 * _24_hour;
+        final long _1_month = 30 * _24_hour;
+
+        long delta = System.currentTimeMillis() - postTime;
+        if( delta < _1_min){
+            return "刚刚 ";
+        } else if( delta < _1_hour) {
+            int time = (int) (delta / _1_min);
+            return time + "分钟前 ";
+        }else if( delta <  _24_hour){
+            int time = (int) (delta / _1_hour);
+            return time+"小时前 ";
+        } else if( delta < _7_day){
+            int time = (int) (delta / _24_hour);
+            return time+"天前 " ;
+        }else if( delta < _1_month){
+            return getDateTime("MM-dd kk:mm", postTime);
+        }else {
+            return getDateTime("yyyy-MM-dd" ,postTime);
+
+        }
     }
+    public String getDateTime(CharSequence format, long msec) {
+        return DateFormat.format(format, msec).toString();
+    }
+
 }
