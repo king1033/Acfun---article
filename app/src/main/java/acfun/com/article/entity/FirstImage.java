@@ -1,30 +1,36 @@
 package acfun.com.article.entity;
 
+import cn.bmob.v3.BmobObject;
+
 /**
  *
  */
-public class FirstImage {
-    private String src;
-    private String text;
+public class FirstImage extends BmobObject{
+    private String imgUrl;
+    private String imgText;
+    private String contentId;
 
-    public void setSrc(String src){
-        this.src = src;
+    public void setImgUrl(String imageUrl){
+        this.imgUrl = imageUrl;
     }
 
-    public String getSrc(){
-        return src;
+    public String getImgUrl(){
+        return imgUrl;
     }
 
-    public void setText(String text){
-        this.text = text;
+    public void setImgText(String imgText) {
+        this.imgText = imgText;
     }
 
-    public String getText() {
-        return text;
+    public String getImgText(){
+        return imgText;
     }
 
-    public void setData(String src, String text){
-        setSrc(src);
-        setText(text);
+    public void setContentId(String contentId){
+        this.contentId = contentId;
+    }
+
+    public String getContentId() {
+        return contentId;
     }
 }

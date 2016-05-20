@@ -46,7 +46,7 @@ public class NetworkImageHolderView  implements Holder<FirstImage> {
         textView.setLayoutParams( textParams );
         textView.setTextColor(Color.WHITE);
         textView.setTextSize(14);
-        textView.setPadding(16, 0, 0, 0);
+        textView.setPadding(16, 0, 0, 10);
         item.addView(textView);
 
         hierarchy = new GenericDraweeHierarchyBuilder(context.getResources())
@@ -59,8 +59,8 @@ public class NetworkImageHolderView  implements Holder<FirstImage> {
 
     @Override
     public void UpdateUI(Context context, int position, FirstImage data) {
-        simpleDraweeView.setImageURI(Uri.parse(data.getSrc()));
-        textView.setText(data.getText());
+        simpleDraweeView.setImageURI(Uri.parse(data.getImgUrl()));
+        textView.setText(data.getImgText());
         simpleDraweeView.setHierarchy(hierarchy);
     }
 

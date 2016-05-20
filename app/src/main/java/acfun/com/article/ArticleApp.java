@@ -16,6 +16,8 @@ import com.nostra13.universalimageloader.core.display.RoundedBitmapDisplayer;
 
 import java.io.File;
 
+import cn.bmob.v3.Bmob;
+
 /**
  *
  */
@@ -38,6 +40,7 @@ public class ArticleApp extends Application {
         /*ImageLoaderConfiguration configuration = ImageLoaderConfiguration.createDefault(this);
         ImageLoader.getInstance().init(configuration);*/
         Fresco.initialize(instance);
+        Bmob.initialize(mContext, "c97e02d64ad0722ae936a096a185f495");
     }
 
     /**
