@@ -3,30 +3,24 @@ package acfun.com.article;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
+
 import android.view.MenuItem;
 import android.view.View;
 
-import acfun.com.article.API.ApiService;
-import acfun.com.article.API.UrlApi;
+
 import acfun.com.article.Swipe.SwipeAppcompatActivity;
-import acfun.com.article.entity.Comments;
-import retrofit2.Retrofit;
-import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
-import retrofit2.converter.gson.GsonConverterFactory;
-import rx.Observer;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
+
 
 public class ArticleActivity extends SwipeAppcompatActivity {
 
-    private int contentId;
+    private String contentId;
+    private String title;
 
     private ArticleFragment articleFragment;
     private CommentFragment commentFragment;
@@ -35,9 +29,13 @@ public class ArticleActivity extends SwipeAppcompatActivity {
 
     private FloatingActionButton fab;
 
-    public static void start(Context context, int contentId){
+    private Toolbar toolbar;
+
+
+    public static void start(Context context, String contentId, String title){
         Intent intent = new Intent(context, ArticleActivity.class);
         intent.putExtra("contentId", contentId);
+        intent.putExtra("title", title);
         context.startActivity(intent);
     }
 
@@ -45,13 +43,29 @@ public class ArticleActivity extends SwipeAppcompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_article);
-        contentId = getIntent().getIntExtra("contentId", 0);
+        contentId = getIntent().getStringExtra("contentId");
+        title= getIntent().getStringExtra("title");
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitle("ac" + contentId);
+        toolbar.getBackground().setAlpha(0);
 
-        toolbar.setTitle("av" + contentId);
+
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+       /* nestedScrollView = (NestedScrollView) findViewById(R.id.article_fragment_contain);
+        nestedScrollView.setOnScrollChangeListener(new NestedScrollView.OnScrollChangeListener() {
+            @Override
+            public void onScrollChange(NestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+                if(scrollY <= 100){
+                    float alpha = (1f * scrollY / (100));
+                    toolbar.getBackground().setAlpha((int)(255 * alpha));
+                }else {
+                    toolbar.getBackground().setAlpha(255);
+                }
+            }
+        });*/
 
 
 
@@ -62,17 +76,16 @@ public class ArticleActivity extends SwipeAppcompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                commentFragment = CommentFragment.newInstance(contentId);
+                commentFragment = CommentFragment.newInstance(Integer.valueOf(contentId));
                 transaction = fragmentManager.beginTransaction();
-                transaction.hide(articleFragment);
-                transaction.add(R.id.article_fragment_contain, commentFragment);
+                transaction.replace(R.id.article_fragment_contain, commentFragment);
                 transaction.addToBackStack(null);
                 transaction.commit();
                 fab.hide();
             }
         });
 
-        articleFragment = ArticleFragment.newInstance(contentId);
+        articleFragment = ArticleFragment.newInstance(Integer.valueOf(contentId));
 
         transaction = fragmentManager.beginTransaction();
         transaction.replace(R.id.article_fragment_contain, articleFragment);

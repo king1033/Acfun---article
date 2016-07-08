@@ -6,14 +6,14 @@
     android:layout_height="wrap_content">
 
     <acfun.com.article.View.MyFrameLayout
-        android:id="@+id/test_content"
+        android:id="@+id/main_content"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
     </acfun.com.article.View.MyFrameLayout>
 
 
     <LinearLayout
-        android:id="@+id/test_tabs"
+        android:id="@+id/main_tabs"
         android:layout_width="match_parent"
         android:layout_height="45dp"
         android:layout_alignParentBottom="true"

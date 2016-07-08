@@ -7,24 +7,40 @@
     android:fitsSystemWindows="true"
     tools:context=".ArticleActivity">
 
-    <android.support.design.widget.AppBarLayout
+
+    <android.support.v4.widget.NestedScrollView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/article_fragment_contain"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:theme="@style/AppTheme.AppBarOverlay">
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
+    </android.support.v4.widget.NestedScrollView>
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:background="@drawable/toolbar_bg"
+        app:popupTheme="@style/AppTheme.PopupOverlay">
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            app:layout_scrollFlags="scroll|enterAlways"
-            app:popupTheme="@style/AppTheme.PopupOverlay" />
+            android:layout_height="100dp">
 
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/rank_test"
+                android:scaleType="fitEnd"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true" />
+        </RelativeLayout>
 
-    </android.support.design.widget.AppBarLayout>
+    </android.support.v7.widget.Toolbar>
 
-
-    <include layout="@layout/content_artcle" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"

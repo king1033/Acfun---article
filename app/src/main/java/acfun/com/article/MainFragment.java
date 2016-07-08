@@ -11,7 +11,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.bigkoo.convenientbanner.ConvenientBanner;
@@ -25,11 +28,13 @@ import com.jcodecraeer.xrecyclerview.XRecyclerView;
 import java.util.List;
 
 import acfun.com.article.API.ApiService;
+import acfun.com.article.API.RetrofitUtil;
 import acfun.com.article.API.UrlApi;
 import acfun.com.article.entity.FirstImage;
 import acfun.com.article.entity.TitlesList;
 import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.listener.FindListener;
+import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -43,7 +48,13 @@ import rx.schedulers.Schedulers;
  */
 public class MainFragment extends Fragment {
 
+    private static final int day = 24 * 60 * 60 * 1000;
+    private static final int week = 7 * 24 * 60 * 60 * 1000;
+    private int range = day;
+    private int type = 110;
+
     private SwipeRefreshLayout swipeRefreshLayout;
+    private SwipeRefreshLayout.OnRefreshListener onRefreshListener;
     private XRecyclerView mRecyclerView;
     public RvAdapter adapter ;
     private View mView;
@@ -53,8 +64,11 @@ public class MainFragment extends Fragment {
     private List<FirstImage> networkImages;
 
 
+    private RelativeLayout relativeLayout;
     private ConvenientBanner convenientBanner;
     private CBViewHolderCreator viewHolderCreator;
+    private Spinner spinnerType;
+    private Spinner spinnerRange;
 
 
     private Retrofit retrofit;
@@ -78,8 +92,10 @@ public class MainFragment extends Fragment {
 
         if (mView == null) {
             mView = inflater.inflate(R.layout.fragment_main, container, false);
-            convenientBanner = (ConvenientBanner) inflater.inflate(R.layout.main_fragment_header, null);
-            adapter = new RvAdapter(inflater, getContext());
+            relativeLayout = (RelativeLayout) inflater.inflate(R.layout.main_fragment_header, null);
+
+
+            adapter = new RvAdapter(inflater, getContext(), 2);
             handler = new Handler();
 
             initView();
@@ -109,15 +125,19 @@ public class MainFragment extends Fragment {
     private void initView(){
         swipeRefreshLayout = (SwipeRefreshLayout) mView.findViewById(R.id.rv_swipe);
         mRecyclerView = (XRecyclerView) mView.findViewById(R.id.id_recycler_view);
-        convenientBanner.setLayoutParams(new RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 400));
+        relativeLayout.setLayoutParams(new RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 480));
+        convenientBanner = (ConvenientBanner) relativeLayout.findViewById(R.id.convenientBanner);
+        spinnerType = (Spinner) relativeLayout.findViewById(R.id.spinner_type);
+        spinnerRange = (Spinner) relativeLayout.findViewById(R.id.spinner_range);
 
-        swipeRefreshLayoutInit();
+        initSwipeRefreshLayout();
         initRecyclerView();
+        initSpin();
     }
 
-    private void swipeRefreshLayoutInit(){
+    private void initSwipeRefreshLayout(){
         //RefreshLayout刷新监听器
-        SwipeRefreshLayout.OnRefreshListener onRefreshListener =
+        onRefreshListener =
                 new SwipeRefreshLayout.OnRefreshListener() {
                     @Override
                     public void onRefresh() {
@@ -170,9 +190,36 @@ public class MainFragment extends Fragment {
                 .setOnItemClickListener(new OnItemClickListener() {
                     @Override
                     public void onItemClick(int position) {
-                        ArticleActivity.start(getContext(), Integer.valueOf(networkImages.get(position).getContentId()));
+                        FirstImage temp = networkImages.get(position);
+                        ArticleActivity.start(getContext(), temp.getContentId(), temp.getImgText());
                     }
                 });
+    }
+
+    private void initSpin(){
+        spinnerRange.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view,
+                                       int pos, long id) {
+                switchRange(pos);
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // Another interface callback
+            }
+        });
+        spinnerType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
+                switchType(pos);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
     }
 
 
@@ -186,13 +233,7 @@ public class MainFragment extends Fragment {
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
-                        swipeRefreshLayout.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                swipeRefreshLayout.setRefreshing(false);
-                            }
-                        });
-                        mRecyclerView.addHeaderView(convenientBanner);
+                        mRecyclerView.addHeaderView(relativeLayout);
                         loadData();
                     }
                 });
@@ -211,12 +252,13 @@ public class MainFragment extends Fragment {
                 .baseUrl(UrlApi.OFFICIAL_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                .client(RetrofitUtil.genericClient())
                 .build();
         apiService = retrofit.create(ApiService.class);
     }
 
     public void loadData(){
-        apiService.GetTitleList(2, 1, 0, 20, 0, 110, 24 * 60 * 60 * 1000)
+        apiService.GetTitleList(1, 0, 20, type, range)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<TitlesList>() {
@@ -232,7 +274,7 @@ public class MainFragment extends Fragment {
                     }
                     @Override
                     public void onError(Throwable e) {
-                        Log.d("test", e.toString());
+                        Log.d("test", "mainFragment: " + e.toString());
                         Toast.makeText(mView.getContext(),"刷新失败", Toast.LENGTH_SHORT).show();
                         mRecyclerView.loadMoreComplete();
                         swipeRefreshLayout.post(new Runnable() {
@@ -244,9 +286,63 @@ public class MainFragment extends Fragment {
                     }
                     @Override
                     public void onNext(TitlesList titlesList) {
+                        if (titlesList.getCode() != 200){
+                            Log.d("test", "mainFragment:" + titlesList.getMessage());
+                        }
                         adapter.getTitles(titlesList.getData().getList());
                     }
                 });
+    }
+
+    private void switchRange(int pos){
+        switch (pos){
+            case 0:
+                if (range != day){
+                    range = day;
+                    refreshData();
+                }
+                break;
+            case 1:
+                if (range != week){
+                    range = week;
+                    refreshData();
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
+    private void switchType(int pos) {
+        switch (pos){
+            case 0:
+                setType(110);
+                break;
+            case 1:
+                setType(73);
+                break;
+            case 2:
+                setType(74);
+                break;
+            case 3:
+                setType(75);
+                break;
+            case 4:
+                setType(164);
+                break;
+        }
+    }
+
+    private void setType(int type){
+        if (this.type != type){
+            this.type = type;
+            refreshData();
+        }
+    }
+
+    private void refreshData(){
+        swipeRefreshLayout.setRefreshing(true);
+        onRefreshListener.onRefresh();
     }
 }
 

@@ -5,6 +5,7 @@ import junit.framework.Test;
 import acfun.com.article.entity.Article;
 import acfun.com.article.entity.Comments;
 import acfun.com.article.entity.TitlesList;
+import retrofit2.Response;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.Query;
@@ -32,7 +33,12 @@ public interface ApiService {
     // 4 最新发布
     // 5 最新回复
     @GET("searches/channel")
-    Observable<TitlesList> GetTitleList(@Header("deviceType") int deviceType, @Query("sort") int sort, @Query("pageNo") int pageNo, @Query("pageSize") int pageSize,
-                               @Query("recommendSize") int recommendSize, @Query("channelIds")int channelIds, @Query("range") int range);
+    Observable<TitlesList> GetTitleList(@Query("sort") int sort, @Query("pageNo") int pageNo, @Query("pageSize") int pageSize
+            , @Query("channelIds")int channelIds, @Query("range") int range);
+
+    @GET("searches/channel")
+    Observable<TitlesList> GetTitleRank(@Query("sort") int sort, @Query("pageNo") int pageNo, @Query("pageSize") int pageSize
+            , @Query("parentChannelId")int parentChannelId, @Query("range") int range);
+
 
 }

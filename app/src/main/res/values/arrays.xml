@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="languages">
+        <item>综合</item>
+        <item>工作情感</item>
+        <item>动漫文化</item>
+        <item>漫画小说</item>
+        <item>游戏</item>
+    </string-array>
+
+    <string-array name="rankTime">
+        <item>今日热点</item>
+        <item>本周热点</item>
+
+    </string-array>
+</resources>

@@ -91,7 +91,9 @@ public class CommentsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         holder.time.setText(comment.getPostDate());
         holder.count.setText("#" + comment.getCount());
         ParseCommentText.setCommentContent(comment.getContent(), holder.content);
-        holder.userImg.setImageURI(Uri.parse(comment.getUserImg()));
+        if (comment.getUserImg() != null) {
+            holder.userImg.setImageURI(Uri.parse(comment.getUserImg()));
+        }
         holder.hasFrame = comment.getQuoteId() > 0;
         holder.floorFrame.removeAllViews();
         if (holder.hasFrame){

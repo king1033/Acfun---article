@@ -30,11 +30,13 @@ public class RvAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private List<Title> mTitles;
 
     private LayoutInflater inflater;
+    private int fit;
 
-    public RvAdapter(LayoutInflater inflater, Context context){
+    public RvAdapter(LayoutInflater inflater, Context context, int fit){
         mTitles = new ArrayList<>();
         this.context = context;
         this.inflater = inflater;
+        this.fit = fit;
     }
 
 
@@ -75,15 +77,19 @@ public class RvAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         holder.mTitle.setText(Html.fromHtml(mTitle.getTitle()));
         holder.mUserName.setText(mTitle.getUser().getUsername());
         holder.mDescription.setText(mTitle.getDescription());
-        holder.mComments.setText(Integer.toString(mTitle.getComments()));
+        if (mTitle.getComments() < 999) {
+            holder.mComments.setText(Integer.toString(mTitle.getComments()));
+        }else {
+            holder.mComments.setText("999");
+        }
         holder.mTime.setText(parseTimeData(mTitle.getReleaseDate()));
         holder.mStows.setText(Integer.toString(mTitle.getStows()));
         holder.mViewer.setText(Integer.toString(mTitle.getViews()));
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Title temp = mTitles.get(holder.getAdapterPosition() - 1);
-                ArticleActivity.start(context, Integer.valueOf(temp.getContentId()));
+                Title temp = mTitles.get(holder.getAdapterPosition() - fit);
+                TestActivity.start(context, temp.getContentId(), temp.getTitle());
             }
         });
     }

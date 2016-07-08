@@ -22,8 +22,8 @@ public class RankFragment extends Fragment {
 
 
 
-    static final String[] typesStr = {"综合", "工作·情感", "动漫文化", "漫画·小说","游戏"};
-    static final int[] channels = {110, 73, 74, 75, 164};
+    static final String[] typesStr = {"最多评论", "最新回复", "最新发布", "最多收藏"};
+    static final int[] sorts = {2, 5, 4, 3};
 
     private List<Fragment> fragments;
 
@@ -48,6 +48,7 @@ public class RankFragment extends Fragment {
             viewPager = (ViewPager)mView.findViewById(R.id.viewpager);
 
             handler = new Handler();
+            fragments = new ArrayList<>();
             for (String a : typesStr){
                 tabs.addTab(tabs.newTab().setText(a));
             }
@@ -55,8 +56,7 @@ public class RankFragment extends Fragment {
                 @Override
                 public void run() {
 
-                    fragments = new ArrayList<>();
-                    for (int a : channels) {
+                    for (int a : sorts) {
                         rankListFragment = RankListFragment.newInstance(a);
                         fragments.add(rankListFragment);
                     }

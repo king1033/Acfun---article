@@ -15,9 +15,16 @@ import android.widget.Toast;
 import com.jcodecraeer.xrecyclerview.ProgressStyle;
 import com.jcodecraeer.xrecyclerview.XRecyclerView;
 
+import java.io.IOException;
+
 import acfun.com.article.API.ApiService;
+import acfun.com.article.API.RetrofitUtil;
 import acfun.com.article.API.UrlApi;
 import acfun.com.article.entity.TitlesList;
+import okhttp3.Interceptor;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -39,14 +46,14 @@ public class RankListFragment extends Fragment {
     private ApiService apiService;
 
 
-    private int channelId;
+    private int sort;
     private int page = 1;
 
 
-    public static RankListFragment newInstance(int channelId){
+    public static RankListFragment newInstance(int sort){
         RankListFragment rankListFragment = new RankListFragment();
         Bundle args = new Bundle();
-        args.putInt("channelId", channelId);
+        args.putInt("sort", sort);
         rankListFragment.setArguments(args);
         return rankListFragment;
     }
@@ -70,13 +77,13 @@ public class RankListFragment extends Fragment {
 
         if (mView == null) {
             mView = inflater.inflate(R.layout.fragment_rank_item, container, false);
-            channelId = getArguments().getInt("channelId");
+            sort = getArguments().getInt("sort");
 
             swipeRefreshLayout = (SwipeRefreshLayout) mView.findViewById(R.id.rv_swipe);
             mRecyclerView = (XRecyclerView) mView.findViewById(R.id.id_recycler_view);
 
 
-            adapter = new RvAdapter(inflater, getContext());
+            adapter = new RvAdapter(inflater, getContext(), 1);
             mRecyclerView.setAdapter(adapter);
 
             initRxJava();
@@ -132,14 +139,15 @@ public class RankListFragment extends Fragment {
                 .baseUrl(UrlApi.OFFICIAL_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                .client(RetrofitUtil.genericClient())
                 .build();
         apiService = retrofit.create(ApiService.class);
 
     }
 
     public void loadData(){
-        /*apiService.RxGetTitlesList("apiserver/content/channel?orderBy=0&channelId=" + channelId +"&pageSize=10&pageNo=" + page)*/
-        apiService.GetTitleList(2, 4, page, 10, 0, channelId, 0)
+
+        apiService.GetTitleRank(sort, page, 10, 63 , 7 * 24 * 60 * 60 * 1000)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<TitlesList>() {
@@ -156,7 +164,7 @@ public class RankListFragment extends Fragment {
                     }
                     @Override
                     public void onError(Throwable e) {
-                        Log.d("test", e.toString());
+                        Log.d("test", "RankListFragment:" + e.toString());
                         Toast.makeText(mView.getContext(),"刷新失败", Toast.LENGTH_SHORT).show();
                         mRecyclerView.loadMoreComplete();
                         swipeRefreshLayout.post(new Runnable() {
@@ -168,6 +176,9 @@ public class RankListFragment extends Fragment {
                     }
                     @Override
                     public void onNext(TitlesList titlesList) {
+                        if (titlesList.getCode() != 200){
+                            Log.d("test", "RankListFragment:" + titlesList.getMessage());
+                        }
                         adapter.getTitles(titlesList.getData().getList());
                     }
                 });

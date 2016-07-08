@@ -45,17 +45,6 @@ public class CommentFragment extends Fragment {
     private View mView;
     private XRecyclerView xRecyclerView;
     private CommentsAdapter adapter;
-    private SwipeRefreshLayout swipeRefreshLayout;
-    private SwipeRefreshLayout.OnRefreshListener onRefreshListener = new SwipeRefreshLayout.OnRefreshListener() {
-        @Override
-        public void onRefresh() {
-            page = 1;
-            xRecyclerView.reset();
-            commentIdList.clear();
-            attr.clear();
-            loadData();
-        }
-    };
 
     private int contentId;
 
@@ -79,7 +68,7 @@ public class CommentFragment extends Fragment {
         mView = inflater.inflate(R.layout.fragment_comment, container, false);
         contentId = getArguments().getInt("contentId");
         xRecyclerView = (XRecyclerView) mView.findViewById(R.id.comments_rv);
-        swipeRefreshLayout = (SwipeRefreshLayout) mView.findViewById(R.id.comment_swipe);
+
         adapter = new CommentsAdapter(getContext());
         adapter.getData(commentIdList, attr);
         xRecyclerView.setAdapter(adapter);
@@ -87,21 +76,7 @@ public class CommentFragment extends Fragment {
         initRxJava();
         initView();
 
-        //swipeRefresh
-        swipeRefreshLayout.setColorSchemeResources(R.color.colorAccent);
-        //滑动监听器
-        swipeRefreshLayout.setOnRefreshListener(onRefreshListener);
-        //必须这样设置才能实现一打开界面自动刷新
-        swipeRefreshLayout.post(new Runnable() {
-            @Override
-            public void run() {
-                swipeRefreshLayout.setRefreshing(true);
-            }
-        });
-        //监听器也要刷新
-        onRefreshListener.onRefresh();
-
-
+        xRecyclerView.setRefreshing(true);
         return mView;
     }
 
@@ -118,6 +93,11 @@ public class CommentFragment extends Fragment {
         XRecyclerView.LoadingListener loadingListener = new XRecyclerView.LoadingListener() {
             @Override
             public void onRefresh() {
+                page = 1;
+                /*xRecyclerView.reset();*/
+                commentIdList.clear();
+                attr.clear();
+                loadData();
             }
 
             @Override
@@ -128,7 +108,7 @@ public class CommentFragment extends Fragment {
 
         final LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         xRecyclerView.setLayoutManager(layoutManager);
-        xRecyclerView.setPullRefreshEnabled(false);
+        xRecyclerView.setPullRefreshEnabled(true);
         xRecyclerView.setLoadingMoreProgressStyle(ProgressStyle.Pacman);
         xRecyclerView.setLoadingListener(loadingListener);
     }
@@ -152,15 +132,17 @@ public class CommentFragment extends Fragment {
 
                     @Override
                     public void onError(Throwable e) {
-
+                        Log.d("test", "error: " + e);
                     }
 
                     @Override
                     public void onNext(Comments comments) {
                         adapter.notifyDataSetChanged();
-                        swipeRefreshLayout.setRefreshing(false);
+                        if (page == 1) {
+                            xRecyclerView.refreshComplete();
+                        }
                         if (comments.getData().getTotalPage() == page){
-                            xRecyclerView.noMoreLoading();
+                            /*xRecyclerView.noMoreLoading();*/
                         }else {
                             page++;
                             xRecyclerView.loadMoreComplete();

@@ -21,7 +21,7 @@ public class MainActivity extends AppCompatActivity {
 
     private LinearLayout tabs;
     private MyFrameLayout frameLayout;
-    private MainFragment testFragment;
+    private MainFragment mainFragment;
     private ImageButton button1;
     private RankFragment rankFragment;
     private ImageButton button2;
@@ -35,8 +35,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        tabs = (LinearLayout) findViewById(R.id.test_tabs);
-        frameLayout = (MyFrameLayout) findViewById(R.id.test_content);
+        tabs = (LinearLayout) findViewById(R.id.main_tabs);
+        frameLayout = (MyFrameLayout) findViewById(R.id.main_content);
         button1 = (ImageButton) findViewById(R.id.button1);
         button2 = (ImageButton) findViewById(R.id.button2);
         button3 = (ImageButton) findViewById(R.id.button3);
@@ -114,13 +114,13 @@ public class MainActivity extends AppCompatActivity {
         switch (index) {
             case 1:
                 button1.setImageResource(R.drawable.ic_home_blue_24dp);
-                if (testFragment == null) {
+                if (mainFragment == null) {
                     // 如果MessageFragment为空，则创建一个并添加到界面上
-                    testFragment = MainFragment.newInstance(110);
-                    transaction.add(R.id.test_content, testFragment);
+                    mainFragment = MainFragment.newInstance(110);
+                    transaction.add(R.id.main_content, mainFragment);
                 } else {
                     // 如果MessageFragment不为空，则直接将它显示出来
-                    transaction.show(testFragment);
+                    transaction.show(mainFragment);
                 }
                 break;
             case 2:
@@ -128,7 +128,7 @@ public class MainActivity extends AppCompatActivity {
                 if (rankFragment == null) {
                     // 如果ContactsFragment为空，则创建一个并添加到界面上
                     rankFragment = new RankFragment();
-                    transaction.add(R.id.test_content, rankFragment);
+                    transaction.add(R.id.main_content, rankFragment);
                 } else {
                     // 如果ContactsFragment不为空，则直接将它显示出来
                     transaction.show(rankFragment);
@@ -138,7 +138,7 @@ public class MainActivity extends AppCompatActivity {
                 button3.setImageResource(R.drawable.ic_message_blue_24dp);
                 if (letterFragment == null){
                     letterFragment = new LetterFragment();
-                    transaction.add(R.id.test_content, letterFragment);
+                    transaction.add(R.id.main_content, letterFragment);
                 }
                 else {
                     transaction.show(letterFragment);
@@ -148,7 +148,7 @@ public class MainActivity extends AppCompatActivity {
                 button4.setImageResource(R.drawable.ic_more_horiz_blue_24dp);
                 if (userFragment == null){
                     userFragment = new UserFragment();
-                    transaction.add(R.id.test_content, userFragment);
+                    transaction.add(R.id.main_content, userFragment);
                 }else {
                     transaction.show(userFragment);
                 }
@@ -160,9 +160,9 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void hideFragments(FragmentTransaction transaction) {
-        if (testFragment != null) {
+        if (mainFragment != null) {
             button1.setImageResource(R.drawable.ic_home_black_24dp);
-            transaction.hide(testFragment);
+            transaction.hide(mainFragment);
         }
         if (rankFragment != null) {
             button2.setImageResource(R.drawable.ic_equalizer_black_24dp);
